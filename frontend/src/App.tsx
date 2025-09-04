@@ -1,35 +1,75 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import axios from 'axios'
 
-function App() {
-  const [count, setCount] = useState(0)
+function Model() {
+
+  const [prompt,setPrompt] = useState("")
+  const [output, setOutput] = useState("")
+  const [loading, setLoading] = useState(false)
+
+
+
+  const Prompt = async () => {
+
+    if (!prompt.trim()) return
+    setLoading(true)
+    setOutput("")
+
+    try {
+      const response = await axios.post('http://localhost:3000/simplify', {
+        text: prompt
+      })
+
+      const data = await response.data
+
+      if (data.simplified) {
+        setOutput(data.simplified)
+      } else {
+        setOutput("somethings Went wrong")
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setOutput("❌ Error connecting to server.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  
+    <div className=" bg-gray-700">
+
+      <div className=" w-full p-10 justify-center text-balance  overflow-y-auto mb-28 text-white ">
+        <p>{output}</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className='fixed  bottom-4 left-0 w-full flex justify-center px-4 '>
+        <div className=" w-full h-25 max-w-5xl bg-gray-800 rounded-full shadow-lg px-4 py-2 flex items-center">
+          <textarea
+            className="flex-1 h-14 bg-gray-800 text-white p-2 rounded-full"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Ask your legal query"
+          />
+          <button
+            onClick={Prompt}
+            disabled={loading}
+            className="bg-gray-500 ml-3 text-white px-4 py-2 rounded-full disabled:opacity-50"
+          >
+            {loading ? "Simplifying..." : "Simplify"}
+          </button>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    
+      
+    </div>
+
+   
+      
+      
+
   )
 }
 
-export default App
+export default Model

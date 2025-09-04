@@ -1,8 +1,12 @@
 import express from "express";
 import type { Request, Response } from "express";
 import { Simplified } from "./services/GPT";
+import cors from 'cors'
+
 
 const app = express()
+
+app.use(cors())
 
 
 app.use(express.json())
